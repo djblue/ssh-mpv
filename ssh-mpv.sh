@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # quickly list/play remote videos over ssh
 
 # quit script on ctrl-c
