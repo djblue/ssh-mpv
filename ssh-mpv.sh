@@ -5,11 +5,13 @@
 trap 'echo interrupted; exit' INT
 
 # script variables
-vars=false  # remove lines after vars are set
-user=''     # username to use when logging in
+vars=false  # remove this line after vars are set
+user=''     # username to use when logging in via ssh
 server=''   # address of remote server
 dir=''      # directory to search on the server
 edit=''     # editor to use for vipe
+jumphost_required=false # set to true if you need to use a jumphost. e.g. if your remote server is not directly reachable
+jumphost='' # enter user@server.fqdn you want to use as jumphost (if needed)
 
 # check that the vars have been set
 if [ -n "$vars" ]; then
@@ -28,17 +30,29 @@ usage () {
 # list remote videos from ssh server
 # $1 - search to use during grep
 list () {
-  ssh $user@$server "find $dir -type f \
-    | sed 's,$dir,,' \
-    | grep -E '(avi|mp4|mkv)$' \
-    | grep -i '$1' \
-    | sort"
+  if [ -n "$jumphost_required" ]; then
+    ssh $user@$server -J $jumphost "find $dir -type f \
+      | sed 's,$dir,,' \
+      | grep -E '(avi|mp4|mkv)$' \
+      | grep -i '$1' \
+      | sort"
+  else
+    ssh $user@$server "find $dir -type f \
+      | sed 's,$dir,,' \
+      | grep -E '(avi|mp4|mkv)$' \
+      | grep -i '$1' \
+      | sort"
+  fi
 }
 
 # call mpv to play video over ssh
 # $1 - path to video from root $dir
 play () {
-  mpv "sftp://$user@$server$dir$1" || exit
+  if [ -n "$jumphost_required" ]; then
+    mpv "sftp://$user@localhost:9999$dir$1"  >/dev/null || exit
+  else
+    mpv "sftp://$user@$server$dir$1" >/dev/null || exit
+  fi
 }
 
 if [ "$1" == '' ]; then
@@ -51,6 +65,12 @@ elif [ "$1" == '-l' ]; then
   list "${*:2}"
 
 elif [ "$1" == '-p' ]; then
+  if [ -n "$jumphost_required" ]; then
+    ssh -L 9999:$server:22 $jumphost >/dev/null 2>/dev/null sleep 3600 &
+    pid=$!
+  fi
+  sleep 1
+
   while read line; do
     play "$line"
   done < /dev/stdin
