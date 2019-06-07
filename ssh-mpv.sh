@@ -8,6 +8,7 @@ trap 'echo interrupted; exit' INT
 vars=false  # remove this line after vars are set
 user=''     # username to use when logging in via ssh
 server=''   # address of remote server
+port='22'   # port to use to connect to server via ssh (default 22)
 dir=''      # directory to search on the server
 edit=''     # editor to use for vipe
 jumphost_required=false # set to true if you need to use a jumphost. e.g. if your remote server is not directly reachable
@@ -37,7 +38,7 @@ list () {
       | grep -i '$1' \
       | sort"
   else
-    ssh $user@$server "find $dir -type f \
+    ssh -p $port $user@$server "find $dir -type f \
       | sed 's,$dir,,' \
       | grep -E '(avi|mp4|mkv)$' \
       | grep -i '$1' \
@@ -51,7 +52,7 @@ play () {
   if [ -n "$jumphost_required" ]; then
     mpv "sftp://$user@localhost:9999$dir$1"  >/dev/null || exit
   else
-    mpv "sftp://$user@$server$dir$1" >/dev/null || exit
+    mpv "sftp://$user@$server:$port$dir$1" >/dev/null || exit
   fi
 }
 
