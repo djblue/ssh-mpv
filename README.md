@@ -26,10 +26,11 @@ Edit the following variables in the script before use.
 
 - user: ssh server user
 - server: ssh server name 
+- port : port to use for ssh (22 by default)
 - dir: directory to search on the ssh server
 - edit: editor to use for vipe
 
-*And you have the option to use a [Jump Host](https://www.tecmint.com/access-linux-server-using-a-jump-host/) to access the server indeirectly if he is e.g. behind a NAT/Firewall)*
+*And you have the option to use a [Jump Host](https://www.tecmint.com/access-linux-server-using-a-jump-host/) to access the server indirectly if he is e.g. behind a NAT/Firewall)*
 
 ## Usage
 
