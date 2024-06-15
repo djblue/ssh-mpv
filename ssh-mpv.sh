@@ -11,7 +11,7 @@ server=''   # address of remote server
 port='22'   # port to use to connect to server via ssh (default 22)
 dir=''      # directory to search on the server
 edit=''     # editor to use for vipe
-jumphost_required=false # set to true if you need to use a jumphost. e.g. if your remote server is not directly reachable
+jumphost_required='' # set to true if you need to use a jumphost. e.g. if your remote server is not directly reachable
 jumphost='' # enter user@server.fqdn you want to use as jumphost (if needed)
 
 # check that the vars have been set
